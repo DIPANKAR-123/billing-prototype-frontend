@@ -1,33 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-const EOBDocuments = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [documents, setDocuments] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5); // You can adjust this number
+const EOBDocuments = ({documents,setDocuments,itemsPerPage,currentPage,setCurrentPage}) => {
+ 
 
   // Fetch jobs from the API
-  const fetchJobs = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost:4000/ai/generate/jobs');
-      if (!response.ok) {
-        throw new Error('Failed to fetch jobs');
-      }
-      const data = await response.json();
-      setDocuments(data); // Set the fetched documents data in state
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  // Fetch jobs when the component mounts
-  useEffect(() => {
-    fetchJobs();
-  }, []);
+
+ 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -69,15 +48,7 @@ const EOBDocuments = () => {
   // Pagination control functions
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // If loading, show loading state
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
-  // If there's an error, display error message
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   // Pagination: Calculate total pages
   const totalPages = Math.ceil(documents.length / itemsPerPage);

@@ -1,37 +1,37 @@
 import React, { useState, useEffect } from 'react';
 
-const DetectedPaymentRecord = () => {
-  const [paymentRecords, setPaymentRecords] = useState([]);
+const DetectedPaymentRecord = ({paymentRecords}) => {
+  // const [paymentRecords, setPaymentRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Fetch data from the backend
-    const fetchPaymentRecords = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/ai/generate/payment-records');  // Replace with your actual API endpoint
-        if (!response.ok) {
-          throw new Error('Failed to fetch payment records');
-        }
-        const data = await response.json();
-        setPaymentRecords(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   // Fetch data from the backend
+  //   const fetchPaymentRecords = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:4000/ai/generate/payment-records');  // Replace with your actual API endpoint
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch payment records');
+  //       }
+  //       const data = await response.json();
+  //       setPaymentRecords(data);
+  //     } catch (error) {
+  //       setError(error.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchPaymentRecords();
-  }, []);
+  //   fetchPaymentRecords();
+  // }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  // if (error) {
+  //   return <div>Error: {error}</div>;
+  // }
 
   return (
     <div className='bg-white p-6 rounded-lg border border-gray-200'>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import {
   Upload,
   FileText,
@@ -12,44 +12,14 @@ import {
 import FileUpload from "./Components/FileUpload";
 import EOBDocuments from "./Components/EOBDocuments";
 import DetectedPaymentRecord from "./Components/DetectedPaymentRecord";
+import Appointments from "./Components/Appointments";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("EOB");
 
   
 
-  const [appointments] = useState([
-    {
-      date: "2023-05-20",
-      clientName: "John Doe",
-      insuranceType: "Medicare",
-      status: "Scheduled",
-    },
-    {
-      date: "2023-05-21",
-      clientName: "Jane Smith",
-      insuranceType: "Blue Cross",
-      status: "Confirmed",
-    },
-    {
-      date: "2023-05-22",
-      clientName: "Bob Johnson",
-      insuranceType: "Aetna",
-      status: "Completed",
-    },
-    {
-      date: "2023-05-23",
-      clientName: "Alice Brown",
-      insuranceType: "Cigna",
-      status: "Cancelled",
-    },
-    {
-      date: "2023-05-24",
-      clientName: "Charlie Davis",
-      insuranceType: "UnitedHealth",
-      status: "Rescheduled",
-    },
-  ]);
+  
 
   const [claims] = useState([
     {
@@ -90,23 +60,117 @@ export default function Dashboard() {
   ]);
 
   const getStatusColor = (status) => {
-    const statusColors = {
-      converted: "bg-green-100 text-green-800",
-      "partially converted": "bg-yellow-100 text-yellow-800",
-      error: "bg-red-100 text-red-800",
-      Scheduled: "bg-blue-100 text-blue-800",
-      Confirmed: "bg-green-100 text-green-800",
-      Completed: "bg-purple-100 text-purple-800",
-      Cancelled: "bg-red-100 text-red-800",
-      Rescheduled: "bg-yellow-100 text-yellow-800",
-      Submitted: "bg-blue-100 text-blue-800",
-      "In Process": "bg-yellow-100 text-yellow-800",
-      Denied: "bg-red-100 text-red-800",
-      Paid: "bg-green-100 text-green-800",
-      Appeal: "bg-purple-100 text-purple-800",
+    const statusColors= {
+      'converted': 'bg-green-100 text-green-800',
+      'partially converted': 'bg-yellow-100 text-yellow-800',
+      'error': 'bg-red-100 text-red-800',
+      'Scheduled': 'bg-blue-100 text-blue-800',
+      'Confirmed': 'bg-green-100 text-green-800',
+      'Completed': 'bg-purple-100 text-purple-800',
+      'Cancelled': 'bg-red-100 text-red-800',
+      'Rescheduled': 'bg-yellow-100 text-yellow-800',
+      'Submitted': 'bg-blue-100 text-blue-800',
+      'In Process': 'bg-yellow-100 text-yellow-800',
+      'Denied': 'bg-red-100 text-red-800',
+      'Paid': 'bg-green-100 text-green-800',
+      'Appeal': 'bg-purple-100 text-purple-800',
+    }
+    return statusColors[status] || 'bg-gray-100 text-gray-800'
+  }
+  const [appointments, setAppointments] = useState([]);
+  const [paymentRecords, setPaymentRecords] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5); // You can adjust this number
+
+  // useEffect(() => {
+  //   // Fetch appointments data
+  //   const fetchAppointments = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:4000/ai/generate/appointment-records');
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch appointments');
+  //       }
+  //       const data = await response.json();
+  //       setAppointments(data);
+  //     } catch (error) {
+  //       console.error('Error fetching appointments:', error);
+  //     }
+  //   };
+
+  //   // Fetch payment records data
+  //   const fetchPaymentRecords = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:4000/ai/generate/payment-records');
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch payment records');
+  //       }
+  //       const data = await response.json();
+  //       setPaymentRecords(data);
+  //     } catch (error) {
+  //       console.error('Error fetching payment records:', error);
+  //     }
+  //   };
+
+  //   fetchAppointments();
+  //   fetchPaymentRecords();
+  // }, []);
+  const [matchedRecords, setMatchedRecords] = useState([]);
+
+  useEffect(() => {
+    const fetchAndMatchData = async () => {
+      try {
+        const responseAppointments = await fetch(
+          "http://localhost:4000/ai/generate/appointment-records"
+        );
+        const responsePayments = await fetch(
+          "http://localhost:4000/ai/generate/payment-records"
+        );
+         try {
+              const response = await fetch('http://localhost:4000/ai/generate/jobs');
+              if (!response.ok) {
+                throw new Error('Failed to fetch jobs');
+              }
+              const data = await response.json();
+              setDocuments(data); // Set the fetched documents data in state
+            } catch (error) {
+            } finally {
+            }
+        if (!responseAppointments.ok || !responsePayments.ok) {
+          throw new Error("Failed to fetch data");
+        }
+  
+        const appointmentsData = await responseAppointments.json();
+        const paymentRecordsData = await responsePayments.json();
+  
+        setAppointments(appointmentsData);
+        setPaymentRecords(paymentRecordsData);
+        try {
+          console.log("here rew",appointmentsData,paymentRecordsData);
+          const response = await fetch('http://localhost:4000/ai/generate/match-records', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ appointmentsData, paymentRecordsData }),
+          });
+          const data = await response.json();
+          setMatchedRecords(data);
+        } catch (error) {
+          console.error('Error fetching matched records:', error);
+        }
+        // Match the appointments and payment records
+      
+      } catch (error) {
+        console.error("Error fetching or matching data:", error);
+      }
     };
-    return statusColors[status] || "bg-gray-100 text-gray-800";
-  };
+  
+    fetchAndMatchData();
+  }, []);
+
+
+  console.log("matchedRecords", matchedRecords,typeof matchRecords);
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
@@ -178,44 +242,14 @@ export default function Dashboard() {
                 </button>
               </div> */}
               <FileUpload />
-              <EOBDocuments />
+              <EOBDocuments documents={documents} currentPage={currentPage} setCurrentPage={setCurrentPage} itemsPerPage={itemsPerPage} />
 
-            <DetectedPaymentRecord/>
+            <DetectedPaymentRecord paymentRecords={paymentRecords}/>
             </div>
           )}
 
           {activeTab === "Appointments" && (
-            <div className='bg-white p-6 rounded-lg border border-gray-200'>
-              <h2 className='text-lg font-semibold mb-4'>Appointments</h2>
-              <table className='w-full'>
-                <thead>
-                  <tr className='text-left border-b border-gray-200'>
-                    <th className='pb-3'>Appointment Date</th>
-                    <th className='pb-3'>Client Name</th>
-                    <th className='pb-3'>Insurance Type</th>
-                    <th className='pb-3'>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {appointments.map((appointment, index) => (
-                    <tr key={index} className='border-b border-gray-100'>
-                      <td className='py-3'>{appointment.date}</td>
-                      <td className='py-3'>{appointment.clientName}</td>
-                      <td className='py-3'>{appointment.insuranceType}</td>
-                      <td className='py-3'>
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                            appointment.status
-                          )}`}
-                        >
-                          {appointment.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+             <Appointments appointments={appointments}/>
           )}
 
           {activeTab === "Claims" && (
@@ -257,7 +291,30 @@ export default function Dashboard() {
           {activeTab === "Workbook" && (
             <div className='bg-white p-6 rounded-lg border border-gray-200'>
               <h2 className='text-lg font-semibold mb-4'>Workbook</h2>
-              <p className='text-gray-600'>Workbook content goes here</p>
+              {console.log("matchedRecords", matchedRecords)}
+              <table className='w-full'>
+                <thead>
+                  <tr className='text-left border-b border-gray-200'>
+                    <th className='pb-3'>Name</th>
+                    <th className='pb-3'>Date</th>
+                    <th className='pb-3'>Amount</th>
+                    <th className='pb-3'>Claim Date</th>
+                    <th className='pb-3'>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {matchedRecords?.matched?.map((record, index) => (
+                    <tr key={index} className='border-b border-gray-100'>
+                      <td className='py-3'>{record?.name}</td>
+                      <td className='py-3'>{record?.date}</td>
+                      <td className='py-3'>{record?.amount}</td>
+                      <td className='py-3'>{record?.claimDate}</td>
+                      <td className='py-3'>{record?.Reconciliation_status}</td>
+                      {/* Add more fields as needed */}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
