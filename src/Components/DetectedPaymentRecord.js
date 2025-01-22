@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
+import getBaseUrl from '../utils/getBaseUrl';
 
 const DetectedPaymentRecord = ({ paymentRecords }) => {
+
   const [records, setRecords] = useState(paymentRecords);
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingRecord, setEditingRecord] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [newRecord, setNewRecord] = useState({ payor: '', client: '', amount: '', appointmentDate: '' });
+  const BASE_URL = getBaseUrl();
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,7 +22,7 @@ const DetectedPaymentRecord = ({ paymentRecords }) => {
 
   const addRecordToBackend = async (record) => {
     try {
-      const response = await fetch('http://localhost:4000/ai/generate/add', {
+      const response = await fetch(`${BASE_URL}/ai/generate/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(record),
@@ -32,7 +36,7 @@ const DetectedPaymentRecord = ({ paymentRecords }) => {
 
   const updateRecordInBackend = async (id, record) => {
     try {
-      const response = await fetch(`http://localhost:4000/ai/generate/${record._id}`, {
+      const response = await fetch(`${BASE_URL}/ai/generate/${record._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(record),
@@ -46,7 +50,7 @@ const DetectedPaymentRecord = ({ paymentRecords }) => {
 
   const deleteRecordFromBackend = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/ai/generate/${id}`, {
+      const response = await fetch(`${BASE_URL}/ai/generate/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete record');

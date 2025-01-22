@@ -1,11 +1,15 @@
 import React,{useState,useEffect} from 'react'
 import FileUpload from './FileUpload';
+import getBaseUrl from '../utils/getBaseUrl';
 
-const Appointments = ({appointments}) => {
-    console.log(appointments,"here")
-    // const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Appointments = ({appointments: initialAppointments}) => {
+  const [appointments, setAppointments] = useState(initialAppointments || []);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const BASE_URL = getBaseUrl();
+
+
+    // const [appointments, setAppointments] = useState([]);
     const getStatusColor = (status) => {
         const statusColors = {
           converted: "bg-green-100 text-green-800",
@@ -75,13 +79,55 @@ const Appointments = ({appointments}) => {
       };
       
     
-  
+      const handleDeleteAll = async () => {
+        if (!window.confirm('Are you sure you want to delete all appointments?')) {
+          return;
+        }
+    
+        setLoading(true);
+        setError(null);
+    
+        try {
+          const response = await fetch(`${BASE_URL}/ai/generate/appointment-records`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+    
+          if (!response.ok) {
+            throw new Error('Failed to delete all appointments');
+          }
+    
+          setAppointments([]);
+          alert('All appointments deleted successfully.');
+        } catch (err) {
+          setError(err.message || 'Something went wrong.');
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+    
     
     
   return (
     <div className="bg-white p-6 rounded-lg border border-gray-200">
-      <FileUpload/>
-    <h2 className="text-lg font-semibold mb-4">Appointments</h2>
+      <FileUpload text={"Appointments"}/>
+      <h2 className="text-lg font-semibold  my-8 border-b-slate-100 border-b-2 py-4 flex justify-between items-center">
+        Appointments
+        <button
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 h-[2.5rem]"
+          onClick={handleDeleteAll}
+          disabled={loading}
+        >
+          {loading ? 'Deleting...' : 'Delete All'}
+        </button>
+      </h2>
+      {error && <p className="text-red-500">{error}</p>}
+    {appointments.length === 0 ? (
+        <p className="text-gray-600">No appointments available.</p>
+      ) :(
     <table className="w-full">
       <thead>
         <tr className="text-left border-b border-gray-200">
@@ -125,7 +171,7 @@ const Appointments = ({appointments}) => {
           </tr>
         ))}
       </tbody>
-    </table>
+    </table>)}
   </div>
 );
 };

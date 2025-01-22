@@ -1,6 +1,6 @@
 "use client";
 
-import { useState ,useEffect} from "react";
+import { useState, useEffect } from "react";
 import {
   Upload,
   FileText,
@@ -14,13 +14,11 @@ import EOBDocuments from "./Components/EOBDocuments";
 import DetectedPaymentRecord from "./Components/DetectedPaymentRecord";
 import Appointments from "./Components/Appointments";
 import WorkBook from "./Components/WorkBook";
+import getBaseUrl from "./utils/getBaseUrl";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("EOB");
-
-  
-
-  
+  const [loading, setLoading] = useState("false");
 
   const [claims] = useState([
     {
@@ -61,117 +59,88 @@ export default function Dashboard() {
   ]);
 
   const getStatusColor = (status) => {
-    const statusColors= {
-      'converted': 'bg-green-100 text-green-800',
-      'partially converted': 'bg-yellow-100 text-yellow-800',
-      'error': 'bg-red-100 text-red-800',
-      'Scheduled': 'bg-blue-100 text-blue-800',
-      'Confirmed': 'bg-green-100 text-green-800',
-      'Completed': 'bg-purple-100 text-purple-800',
-      'Cancelled': 'bg-red-100 text-red-800',
-      'Rescheduled': 'bg-yellow-100 text-yellow-800',
-      'Submitted': 'bg-blue-100 text-blue-800',
-      'In Process': 'bg-yellow-100 text-yellow-800',
-      'Denied': 'bg-red-100 text-red-800',
-      'Paid': 'bg-green-100 text-green-800',
-      'Appeal': 'bg-purple-100 text-purple-800',
-    }
-    return statusColors[status] || 'bg-gray-100 text-gray-800'
-  }
+    const statusColors = {
+      converted: "bg-green-100 text-green-800",
+      "partially converted": "bg-yellow-100 text-yellow-800",
+      error: "bg-red-100 text-red-800",
+      Scheduled: "bg-blue-100 text-blue-800",
+      Confirmed: "bg-green-100 text-green-800",
+      Completed: "bg-purple-100 text-purple-800",
+      Cancelled: "bg-red-100 text-red-800",
+      Rescheduled: "bg-yellow-100 text-yellow-800",
+      Submitted: "bg-blue-100 text-blue-800",
+      "In Process": "bg-yellow-100 text-yellow-800",
+      Denied: "bg-red-100 text-red-800",
+      Paid: "bg-green-100 text-green-800",
+      Appeal: "bg-purple-100 text-purple-800",
+    };
+    return statusColors[status] || "bg-gray-100 text-gray-800";
+  };
   const [appointments, setAppointments] = useState([]);
   const [paymentRecords, setPaymentRecords] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5); // You can adjust this number
-
-  // useEffect(() => {
-  //   // Fetch appointments data
-  //   const fetchAppointments = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:4000/ai/generate/appointment-records');
-  //       if (!response.ok) {
-  //         throw new Error('Failed to fetch appointments');
-  //       }
-  //       const data = await response.json();
-  //       setAppointments(data);
-  //     } catch (error) {
-  //       console.error('Error fetching appointments:', error);
-  //     }
-  //   };
-
-  //   // Fetch payment records data
-  //   const fetchPaymentRecords = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:4000/ai/generate/payment-records');
-  //       if (!response.ok) {
-  //         throw new Error('Failed to fetch payment records');
-  //       }
-  //       const data = await response.json();
-  //       setPaymentRecords(data);
-  //     } catch (error) {
-  //       console.error('Error fetching payment records:', error);
-  //     }
-  //   };
-
-  //   fetchAppointments();
-  //   fetchPaymentRecords();
-  // }, []);
+  const [itemsPerPage, setItemsPerPage] = useState(5); // 
   const [matchedRecords, setMatchedRecords] = useState([]);
+  const BASE_URL = getBaseUrl();
 
   useEffect(() => {
     const fetchAndMatchData = async () => {
       try {
+        setLoading(true);
         const responseAppointments = await fetch(
-          "http://localhost:4000/ai/generate/appointment-records"
+          `${BASE_URL}/ai/generate/appointment-records`
         );
         const responsePayments = await fetch(
-          "http://localhost:4000/ai/generate/payment-records"
+          `${BASE_URL}/ai/generate/payment-records`
         );
          try {
-              const response = await fetch('http://localhost:4000/ai/generate/jobs');
+              const response = await fetch(`${BASE_URL}/ai/generate/jobs`);
               if (!response.ok) {
                 throw new Error('Failed to fetch jobs');
               }
               const data = await response.json();
-              setDocuments(data); 
+              setDocuments(data);
             } catch (error) {
             } finally {
             }
         if (!responseAppointments.ok || !responsePayments.ok) {
           throw new Error("Failed to fetch data");
         }
-  
+
         const appointmentsData = await responseAppointments.json();
         const paymentRecordsData = await responsePayments.json();
-  
+
         setAppointments(appointmentsData);
         setPaymentRecords(paymentRecordsData);
         try {
-          console.log("here rew",appointmentsData,paymentRecordsData);
-          const response = await fetch('http://localhost:4000/ai/generate/match-records', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ appointmentsData, paymentRecordsData }),
-          });
+          console.log("here rew", appointmentsData, paymentRecordsData);
+          const response = await fetch(
+            `${BASE_URL}/ai/generate/match-records`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              // body: JSON.stringify({ appointmentsData, paymentRecordsData }),
+            }
+          );
           const data = await response.json();
           setMatchedRecords(data);
+          setLoading(false);
         } catch (error) {
-          console.error('Error fetching matched records:', error);
+          console.error("Error fetching matched records:", error);
         }
         // Match the appointments and payment records
-      
       } catch (error) {
         console.error("Error fetching or matching data:", error);
       }
     };
-  
+
     fetchAndMatchData();
   }, []);
 
-
-  console.log("matchedRecords", matchedRecords,typeof matchRecords);
+  console.log("matchedRecords", matchedRecords, typeof matchRecords);
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
@@ -242,15 +211,29 @@ export default function Dashboard() {
                   Upload EOBs
                 </button>
               </div> */}
-              <FileUpload />
+              <FileUpload text={"EOBs"} setActiveTab={setActiveTab}/>
               <EOBDocuments documents={documents} currentPage={currentPage} setCurrentPage={setCurrentPage} itemsPerPage={itemsPerPage} />
+              {loading ? (
+                <>Loading...</>
+              ) : paymentRecords.length > 0 ? (
+                <DetectedPaymentRecord paymentRecords={paymentRecords} />
+              ) : (
+                <p className='text-gray-600'>
+                  No EOB Payment records available.
+                </p>
+              )}
 
-            <DetectedPaymentRecord paymentRecords={paymentRecords}/>
+              {/* <DetectedPaymentRecord paymentRecords={paymentRecords}/> */}
             </div>
           )}
 
-          {activeTab === "Appointments" && (
-             <Appointments appointments={appointments}/>
+          {activeTab === "Appointments" && (<>
+            {loading ? (
+              <>Loading...</>
+            ) : (
+              <Appointments appointments={appointments} />
+            ) }
+            </>
           )}
 
           {activeTab === "Claims" && (
@@ -290,7 +273,7 @@ export default function Dashboard() {
           )}
 
           {activeTab === "Workbook" && (
-            <WorkBook matchedRecords={matchedRecords}/>
+            <WorkBook matchedRecords={matchedRecords} />
           )}
         </div>
       </div>
