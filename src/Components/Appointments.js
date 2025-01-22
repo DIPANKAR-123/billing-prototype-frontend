@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from 'react'
+import FileUpload from './FileUpload';
 
 const Appointments = ({appointments}) => {
     console.log(appointments,"here")
@@ -79,6 +80,7 @@ const Appointments = ({appointments}) => {
     
   return (
     <div className="bg-white p-6 rounded-lg border border-gray-200">
+      <FileUpload/>
     <h2 className="text-lg font-semibold mb-4">Appointments</h2>
     <table className="w-full">
       <thead>
@@ -87,27 +89,27 @@ const Appointments = ({appointments}) => {
           <th className="pb-3">Client Name</th>
           <th className="pb-3">Clinician</th>
           <th className="pb-3">Billing Code</th>
-          <th className="pb-3">Rate per Unit</th>
-          <th className="pb-3">Units</th>
+          {/* <th className="pb-3">Rate per Unit</th> */}
+          {/* <th className="pb-3">Units</th> */}
           <th className="pb-3">Total Fee</th>
-          <th className="pb-3">Client Payment Status</th>
+          {/* <th className="pb-3">Client Payment Status</th>
           <th className="pb-3">Charge</th>
           <th className="pb-3">Uninvoiced</th>
           <th className="pb-3">Paid</th>
-          <th className="pb-3">Unpaid</th>
+          <th className="pb-3">Unpaid</th> */}
         </tr>
       </thead>
       <tbody>
         {appointments.map((appointment, index) => (
           <tr key={index} className="border-b border-gray-100">
-            <td className="py-3">{(appointment['Date of Service'])}</td>
-            <td className="py-3">{appointment.Client}</td>
-            <td className="py-3">{appointment.Clinician}</td>
-            <td className="py-3">{appointment['Billing Code']}</td>
-            <td className="py-3">{appointment['Rate per Unit']}</td>
-            <td className="py-3">{appointment.Units}</td>
-            <td className="py-3">{appointment['Total Fee']}</td>
-            <td className="py-3">
+            <td className="py-3">{(appointment.appointmentDate)}</td>
+            <td className="py-3">{appointment.client}</td>
+            <td className="py-3">{appointment.clinician}</td>
+            <td className="py-3">{appointment.billingCode}</td>
+            {/* <td className="py-3">{appointment['Rate per Unit']}</td> */}
+            {/* <td className="py-3">{appointment.Units}</td> */}
+            <td className="py-3">{appointment.amount}</td>
+            {/* <td className="py-3">
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
                   appointment['Client Payment Status']
@@ -119,7 +121,7 @@ const Appointments = ({appointments}) => {
             <td className="py-3">{appointment.Charge}</td>
             <td className="py-3">{appointment.Uninvoiced}</td>
             <td className="py-3">{appointment.Paid}</td>
-            <td className="py-3">{appointment.Unpaid}</td>
+            <td className="py-3">{appointment.Unpaid}</td> */}
           </tr>
         ))}
       </tbody>

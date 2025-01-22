@@ -1,66 +1,256 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const DetectedPaymentRecord = ({paymentRecords}) => {
-  // const [paymentRecords, setPaymentRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const DetectedPaymentRecord = ({ paymentRecords }) => {
+  const [records, setRecords] = useState(paymentRecords);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newRecord, setNewRecord] = useState({ payor: '', client: '', amount: '', appointmentDate: '' });
 
-  // useEffect(() => {
-  //   // Fetch data from the backend
-  //   const fetchPaymentRecords = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:4000/ai/generate/payment-records');  // Replace with your actual API endpoint
-  //       if (!response.ok) {
-  //         throw new Error('Failed to fetch payment records');
-  //       }
-  //       const data = await response.json();
-  //       setPaymentRecords(data);
-  //     } catch (error) {
-  //       setError(error.message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (isAdding) {
+      setNewRecord({ ...newRecord, [name]: value });
+    } else {
+      setEditingRecord({ ...editingRecord, [name]: value });
+    }
+  };
 
-  //   fetchPaymentRecords();
-  // }, []);
+  const addRecordToBackend = async (record) => {
+    try {
+      const response = await fetch('http://localhost:4000/ai/generate/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record),
+      });
+      if (!response.ok) throw new Error('Failed to add record');
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
+  const updateRecordInBackend = async (id, record) => {
+    try {
+      const response = await fetch(`http://localhost:4000/ai/generate/${record._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record),
+      });
+      if (!response.ok) throw new Error('Failed to update record');
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  // if (error) {
-  //   return <div>Error: {error}</div>;
-  // }
+  const deleteRecordFromBackend = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:4000/ai/generate/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete record');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSaveEdit = async (index) => {
+    const updatedRecords = [...records];
+    const updatedRecord = editingRecord;
+
+    // Assuming `id` is part of the record
+    await updateRecordInBackend(updatedRecord._id, updatedRecord);
+
+    updatedRecords[index] = updatedRecord;
+    setRecords(updatedRecords);
+    setEditingIndex(null);
+    setEditingRecord(null);
+  };
+
+  const handleAddRecord = async () => {
+    const addedRecord = await addRecordToBackend(newRecord);
+    setRecords([...records, addedRecord]);
+    setNewRecord({ payor: '', client: '', amount: '', appointmentDate: '' });
+    setIsAdding(false);
+  };
+
+  const handleDeleteRecord = async (index) => {
+    const recordToDelete = records[index];
+
+    // Assuming `id` is part of the record
+    await deleteRecordFromBackend(recordToDelete._id);
+
+    setRecords(records.filter((_, i) => i !== index));
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
+    setEditingRecord(null);
+  };
+
+  const handleCancelAdd = () => {
+    setNewRecord({ payor: '', client: '', amount: '', appointmentDate: '' });
+    setIsAdding(false);
+  };
+  console.log(records)
 
   return (
     <div className='bg-white p-6 rounded-lg border border-gray-200'>
-      <h2 className='text-lg font-semibold mb-4'>
-        Detected Payment Records
-      </h2>
+      <h2 className='text-lg font-semibold mb-4'>Detected Payment Records</h2>
       <table className='w-full'>
         <thead>
           <tr className='text-left border-b border-gray-200'>
             <th className='pb-3'>Payor Name</th>
             <th className='pb-3'>Client Name</th>
             <th className='pb-3'>Amount</th>
-            <th className='pb-3'>Claim Date</th>
             <th className='pb-3'>Appointment Date</th>
+            <th className='pb-3'>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {paymentRecords.map((record, index) => (
+          {records.map((record, index) => (
             <tr key={index} className='border-b border-gray-100'>
-              <td className='py-3'>{record.payorName}</td>
-              <td className='py-3'>{record.clientName}</td>
-              <td className='py-3'>{record.amount}</td>
-              <td className='py-3'>{record.claimDate}</td>
-              <td className='py-3'>{record.appointmentDate}</td>
+              {editingIndex === index ? (
+                <>
+                  <td className='py-3'>
+                    <input
+                      type='text'
+                      name='payor'
+                      value={editingRecord.payor}
+                      onChange={handleInputChange}
+                      className='w-full p-2 border rounded'
+                    />
+                  </td>
+                  <td className='py-3'>
+                    <input
+                      type='text'
+                      name='client'
+                      value={editingRecord.client}
+                      onChange={handleInputChange}
+                      className='w-full p-2 border rounded'
+                    />
+                  </td>
+                  <td className='py-3'>
+                    <input
+                      type='number'
+                      name='amount'
+                      value={editingRecord.amount}
+                      onChange={handleInputChange}
+                      className='w-full p-2 border rounded'
+                    />
+                  </td>
+                  <td className='py-3'>
+                    <input
+                      type='date'
+                      name='appointmentDate'
+                      value={editingRecord.appointmentDate}
+                      onChange={handleInputChange}
+                      className='w-full p-2 border rounded'
+                    />
+                  </td>
+                  <td className='py-3'>
+                    <button
+                      className='mr-2 bg-blue-500 text-white py-1 px-3 rounded-lg hover:bg-blue-600'
+                      onClick={() => handleSaveEdit(index)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className='bg-gray-300 text-gray-700 py-1 px-3 rounded-lg'
+                      onClick={handleCancelEdit}
+                    >
+                      Cancel
+                    </button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td className='py-3'>{record?.payor}</td>
+                  <td className='py-3'>{record?.client}</td>
+                  <td className='py-3'>{record?.amount}</td>
+                  <td className='py-3'>{record?.appointmentDate}</td>
+                  <td className='py-3'>
+                    <button
+                      className='mr-2 text-blue-500 hover:underline'
+                      onClick={() => {
+                        setEditingIndex(index);
+                        setEditingRecord(record);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className='text-red-500 hover:underline'
+                      onClick={() => handleDeleteRecord(index)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </>
+              )}
             </tr>
           ))}
+          {isAdding && (
+            <tr className='border-b border-gray-100'>
+              <td className='py-3'>
+                <input
+                  type='text'
+                  name='payor'
+                  value={newRecord?.payor}
+                  onChange={handleInputChange}
+                  className='w-full p-2 border rounded'
+                />
+              </td>
+              <td className='py-3'>
+                <input
+                  type='text'
+                  name='client'
+                  value={newRecord?.client}
+                  onChange={handleInputChange}
+                  className='w-full p-2 border rounded'
+                />
+              </td>
+              <td className='py-3'>
+                <input
+                  type='number'
+                  name='amount'
+                  value={newRecord?.amount}
+                  onChange={handleInputChange}
+                  className='w-full p-2 border rounded'
+                />
+              </td>
+              <td className='py-3'>
+                <input
+                  type='date'
+                  name='appointmentDate'
+                  value={newRecord?.appointmentDate}
+                  onChange={handleInputChange}
+                  className='w-full p-2 border rounded'
+                />
+              </td>
+              <td className='py-3'>
+                <button
+                  className='mr-2 bg-green-500 text-white py-1 px-3 rounded-lg hover:bg-green-600'
+                  onClick={handleAddRecord}
+                >
+                  Add
+                </button>
+                <button
+                  className='bg-gray-300 text-gray-700 py-1 px-3 rounded-lg'
+                  onClick={handleCancelAdd}
+                >
+                  Cancel
+                </button>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
-      <button className='w-full mt-4 bg-black text-white py-2 rounded-lg hover:bg-gray-800'>
+      <button
+        className='w-full mt-4 bg-black text-white py-2 rounded-lg hover:bg-gray-800'
+        onClick={() => setIsAdding(true)}
+      >
         Manually add converted payment records
       </button>
     </div>

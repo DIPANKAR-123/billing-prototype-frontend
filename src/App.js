@@ -13,6 +13,7 @@ import FileUpload from "./Components/FileUpload";
 import EOBDocuments from "./Components/EOBDocuments";
 import DetectedPaymentRecord from "./Components/DetectedPaymentRecord";
 import Appointments from "./Components/Appointments";
+import WorkBook from "./Components/WorkBook";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("EOB");
@@ -132,7 +133,7 @@ export default function Dashboard() {
                 throw new Error('Failed to fetch jobs');
               }
               const data = await response.json();
-              setDocuments(data); // Set the fetched documents data in state
+              setDocuments(data); 
             } catch (error) {
             } finally {
             }
@@ -289,33 +290,7 @@ export default function Dashboard() {
           )}
 
           {activeTab === "Workbook" && (
-            <div className='bg-white p-6 rounded-lg border border-gray-200'>
-              <h2 className='text-lg font-semibold mb-4'>Workbook</h2>
-              {console.log("matchedRecords", matchedRecords)}
-              <table className='w-full'>
-                <thead>
-                  <tr className='text-left border-b border-gray-200'>
-                    <th className='pb-3'>Name</th>
-                    <th className='pb-3'>Date</th>
-                    <th className='pb-3'>Amount</th>
-                    <th className='pb-3'>Claim Date</th>
-                    <th className='pb-3'>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {matchedRecords?.matched?.map((record, index) => (
-                    <tr key={index} className='border-b border-gray-100'>
-                      <td className='py-3'>{record?.name}</td>
-                      <td className='py-3'>{record?.date}</td>
-                      <td className='py-3'>{record?.amount}</td>
-                      <td className='py-3'>{record?.claimDate}</td>
-                      <td className='py-3'>{record?.Reconciliation_status}</td>
-                      {/* Add more fields as needed */}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <WorkBook matchedRecords={matchedRecords}/>
           )}
         </div>
       </div>
