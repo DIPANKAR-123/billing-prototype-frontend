@@ -61,24 +61,24 @@ const FileUpload = ({ text,setActiveTab }) => {
   return (
     <div className='bg-white p-6 rounded-lg border border-gray-200'>
       <h2 className='text-lg font-semibold mb-4'>Upload {text}</h2>
-      <div className='border-2 border-dashed border-gray-300 rounded-lg p-12 text-center'>
+          <label htmlFor='file-upload'>
+      <div  className='border-2 border-dashed border-gray-300 rounded-lg p-12 text-center'>
         <div className='flex justify-center mb-4'>
           {/* <UploadIcon className="w-12 h-12 text-gray-400" /> */}
-          <label htmlFor='file-upload'>
             <UploadIcon className='w-12 h-12 text-gray-400' />
-          </label>
           <input
             id='file-upload'
             type='file'
             className='hidden'
             onChange={handleFileChange}
-          />
+            />
         </div>
-        <p className='text-gray-600 mb-2'>Click to upload or drag and drop</p>
+        <p className='text-gray-600 mb-2'>Select a file to upload or drag and drop</p>
         <p className='text-sm text-gray-500'>
           PDF, PNG, JPG or GIF (MAX. 10MB)
         </p>
       </div>
+            </label>
       <button
         onClick={handleUpload}
         disabled={loading}
