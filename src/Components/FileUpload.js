@@ -84,7 +84,7 @@ const FileUpload = ({ text,setActiveTab }) => {
         disabled={loading}
         className='w-full mt-4 bg-black text-white py-2 rounded-lg hover:bg-gray-800'
       >
-        {loading ? "Uploading..." : `Click to upload ${text}...`}
+        {loading ? "Uploading..." : `Click to upload ${text}... after uploading the file`}
       </button>
     </div>
   );
