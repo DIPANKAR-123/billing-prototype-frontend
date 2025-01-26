@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react'
 import axios from 'axios';
 import { usePlaidLink } from 'react-plaid-link';
 import { Link2, CreditCard, Wallet, Building } from 'lucide-react'
+import getBaseUrl from '../../../utils/getBaseUrl';
 
 const LinkAccount = () => {
     const [linkToken, setLinkToken] = useState(null);
@@ -9,13 +10,14 @@ const LinkAccount = () => {
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null)
+  const BASE_URL = getBaseUrl();
 
 
   // Fetch link token on load
   useEffect(() => {
     const fetchLinkToken = async () => {
       try {
-        const response = await axios.post('http://localhost:4000/plaid/create-link-token', { userId: '12345' });
+        const response = await axios.post(`${BASE_URL}/plaid/create-link-token`, { userId: '12345' });
         setLinkToken(response.data.link_token);
       } catch (error) {
         console.error('Error fetching link token:', error);
@@ -26,7 +28,7 @@ const LinkAccount = () => {
 
   const onSuccess = async (publicToken) => {
     try {
-      const response = await axios.post('http://localhost:4000/plaid/exchange-public-token', { publicToken });
+      const response = await axios.post(`${BASE_URL}/plaid/exchange-public-token`, { publicToken });
       setAccessToken(response.data.access_token);
       fetchAccounts(response.data.access_token);
       console.log(response.data,"success")
@@ -38,7 +40,7 @@ const LinkAccount = () => {
   const fetchAccounts = async (accessToken) => {
     try {
         console.log("accounts",accessToken)
-      const response = await axios.post('http://localhost:4000/plaid/accounts', { accessToken });
+      const response = await axios.post(`${BASE_URL}/plaid/accounts`, { accessToken });
       setAccounts(response.data.accounts);
     //   fetchTransactions(accessToken, '2023-05-01', '2023-05-31'); // Replace with desired start and end dates
     } catch (error) {
@@ -48,7 +50,7 @@ const LinkAccount = () => {
 
   const fetchTransactions = async (accessToken, startDate, endDate) => {
     try {
-      const response = await axios.post('http://localhost:4000/plaid/transactions', {
+      const response = await axios.post(`${BASE_URL}/plaid/transactions`, {
           accessToken, startDate, endDate 
       });
       console.log('Transactions:', response.data);
