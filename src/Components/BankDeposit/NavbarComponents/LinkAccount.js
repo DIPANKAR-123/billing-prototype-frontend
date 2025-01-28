@@ -68,7 +68,7 @@ const LinkAccount = () => {
   const handleFetchTransactions = () => {
     const accessToke = accessToken;
     const startDate = '2023-04-14';
-    const endDate = '2024-04-17';
+    const endDate = '2025-01-01';
 
     fetchTransactions(accessToke, startDate, endDate);
   };

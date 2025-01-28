@@ -161,11 +161,11 @@ export default function Dashboard() {
           </button>
           <button onClick={()=>setSIdeBar("BankDeposit")} className='flex items-center space-x-2 w-full px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg'>
             <Users className='w-5 h-5' />
-            <span>Bank Data</span>
+            <span>Bank Reconciliation</span>
           </button>
           <button onClick={()=>setSIdeBar("Gopay")} className='flex items-center space-x-2 w-full px-4 py-2 hover:bg-gray-100 text-gray-900 rounded-lg'>
             <ClipboardList className='w-5 h-5' />
-            <span>Gopay</span>
+            <span>Medpay</span>
           </button>
         </nav>
       </div>

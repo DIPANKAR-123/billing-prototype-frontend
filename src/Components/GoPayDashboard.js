@@ -140,7 +140,7 @@ const GoPayDashboard = () => {
   return (
     <div className='flex-1 p-8'>
     <div className='w-full mx-auto'>
-      <h1 className='text-2xl font-bold mb-2'>Gopay Dashboard</h1>
+      <h1 className='text-2xl font-bold mb-2'>Medpay Dashboard</h1>
       <p className='text-gray-600 mb-6'>
         Manage your EOB, Appointments, Claims, and Workbook
       </p>

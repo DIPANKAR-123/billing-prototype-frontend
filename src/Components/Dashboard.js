@@ -74,7 +74,7 @@ export default function Dashboard() {
           </button>
           <button className="flex items-center space-x-2 w-full px-4 py-2 bg-gray-100 text-gray-900 rounded-lg">
             <ClipboardList className="w-5 h-5" />
-            <span>Gopay</span>
+            <span>Medpay</span>
           </button>
         </nav>
       </div>
@@ -82,7 +82,7 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="flex-1 p-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold mb-2">Gopay Dashboard</h1>
+          <h1 className="text-2xl font-bold mb-2">Medpay Dashboard</h1>
           <p className="text-gray-600 mb-6">Manage your EOB, Appointments, Claims, and Workbook</p>
 
           {/* Tabs */}
