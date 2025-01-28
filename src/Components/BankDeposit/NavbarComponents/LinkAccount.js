@@ -10,6 +10,7 @@ const LinkAccount = () => {
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null)
+   const [transactionsres, setTransactionsRes] = useState([]);
   const BASE_URL = getBaseUrl();
 
 
@@ -54,6 +55,7 @@ const LinkAccount = () => {
           accessToken, startDate, endDate 
       });
       console.log('Transactions:', response.data);
+      setTransactionsRes(response)
       setAccounts(response.data?.accounts)
       setTransactions(response.data?.transactions);
     } catch (error) {
@@ -97,6 +99,18 @@ const LinkAccount = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+};
+
+const exportToJson = () => {
+  const jsonData = JSON.stringify(transactionsres, null, 2);
+  const blob = new Blob([jsonData], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'transactions.json';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
       const [payments, setPayments] = useState([
         { date: '2023-05-15', company: 'Blue Cross Blue Shield', amount: 5000.00, status: 'Reconciled' },
@@ -161,6 +175,13 @@ const LinkAccount = () => {
             )}
 
       <div>
+
+      {transactions.length > 0 && <button
+                    onClick={exportToJson}
+                    className="bg-green-500 text-white px-4 py-2 rounded mb-4"
+                >
+                    Download Transactions JSON
+                </button>}
       <div className="col-span-1 bg-gray-50 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Linked Accounts</h3>
             <div className="space-y-2">
