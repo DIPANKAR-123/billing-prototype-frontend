@@ -83,7 +83,21 @@ const LinkAccount = () => {
         return <Building className="w-5 h-5" />
     }
   }
+  const downloadCSV = () => {
+    if (!transactions.length) return;
 
+    const headers = Object.keys(transactions[0]);
+    const csvRows = [headers.join(','), ...transactions.map(tx => headers.map(header => JSON.stringify(tx[header] || '')).join(','))];
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'transactions.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
       const [payments, setPayments] = useState([
         { date: '2023-05-15', company: 'Blue Cross Blue Shield', amount: 5000.00, status: 'Reconciled' },
         { date: '2023-05-14', company: 'Aetna', amount: 3500.00, status: 'Pending' },
@@ -136,6 +150,15 @@ const LinkAccount = () => {
       >
         Fetch Transactions
       </button>}
+
+      {transactions.length > 0 && (
+                <button
+                    onClick={downloadCSV}
+                    className="bg-green-500 text-white px-4 py-2 rounded mb-4"
+                >
+                    Download Transactions CSV
+                </button>
+            )}
 
       <div>
       <div className="col-span-1 bg-gray-50 rounded-lg p-4">
