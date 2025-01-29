@@ -11,6 +11,7 @@ const LinkAccount = () => {
   const [transactions, setTransactions] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null)
    const [transactionsres, setTransactionsRes] = useState([]);
+   const [isQuickBooksConnected, setIsQuickBooksConnected] = useState(false);
   const BASE_URL = getBaseUrl();
 
 
@@ -57,10 +58,63 @@ const LinkAccount = () => {
       console.log('Transactions:', response.data);
       setTransactionsRes(response)
       setAccounts(response.data?.accounts)
-      setTransactions(response.data?.transactions);
+      setTransactions((prevTransactions) => [...prevTransactions, ...response.data?.transactions]);
     } catch (error) {
       console.error('Error fetching transactions:', error.response?.data || error.message);
     }
+  };
+
+  useEffect(() => {
+    const handleMessage = (event) => {
+      // Ensure the message is coming from a trusted origin
+      // if (event.origin !== "http://localhost:3000") return;
+      if(event.origin !== "https://billing-prototype-frontend.vercel.app"){
+        return;
+      }
+
+      const { accessToken,realmId } = event.data;
+      if (accessToken) {
+        // Store the token in localStorage
+        localStorage.setItem("quickBooksAccessToken", accessToken);
+        localStorage.setItem("quickBooksRealmId", realmId);
+        setIsQuickBooksConnected(true);
+        // Optionally, close the popup if still open
+        if (event.source) event.source.close();
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    // Check if already connected
+    const token = localStorage.getItem("quickBooksAccessToken");
+    if (token) {
+      setIsQuickBooksConnected(true);
+    }
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  const handleConnectQuickbooks = () => {
+    const width = 600;
+    const height = 700;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+
+    // Open a popup window for OAuth
+    window.open(
+      // "http://localhost:4000/quickbooks/connect",
+      `${BASE_URL}/quickbooks/connect`,
+      "QuickBooks Connection",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
+  };
+
+  const handleDisconnectQuickbooks = () => {
+    localStorage.removeItem("quickBooksAccessToken");
+    localStorage.removeItem("quickBooksRealmId");
+    setIsQuickBooksConnected(false);
   };
 
   const { open, ready } = usePlaidLink({
@@ -101,6 +155,21 @@ const LinkAccount = () => {
     document.body.removeChild(link);
 };
 
+const handleFetchQuickbooksTransactions = async () => {
+  try{
+    const response = await axios.get(`${BASE_URL}/quickbooks/transactions`, 
+      {
+        headers: {
+          access_token: localStorage.getItem("quickBooksAccessToken"),
+          realmId: localStorage.getItem("quickBooksRealmId")
+        }
+      });
+    setTransactions((prevTransactions) => [...prevTransactions, ...response.data?.transactions]);
+  }catch(error){
+    console.error("Error fetching quickbooks transactions:", error)
+  }
+}
+
 const exportToJson = () => {
   const jsonData = JSON.stringify(transactionsres, null, 2);
   const blob = new Blob([jsonData], { type: 'application/json' });
@@ -123,12 +192,21 @@ const exportToJson = () => {
     <p className="text-gray-600 mb-4">Link your financial accounts for automatic reconciliation</p>
     
     <div className="flex space-x-4 mb-8">
-      <button className="bg-gray-800 text-white px-4 py-2 rounded flex items-center">
-        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-        </svg>
-        Connect Quickbooks(Coming soon)
-      </button>
+      {!isQuickBooksConnected ? (
+            <button
+              onClick={handleConnectQuickbooks}
+              className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Connect to QuickBooks
+            </button>
+          ) : (
+            <button
+              onClick={handleDisconnectQuickbooks}
+              className="mb-4 bg-green-500 text-white px-4 py-2 rounded"
+            >
+              QuickBooks Connected
+            </button>
+          )}
       <button 
         onClick={() => open()} 
         disabled={!ready}
@@ -160,6 +238,12 @@ const exportToJson = () => {
 
      {accessToken &&  <button
         onClick={handleFetchTransactions}
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+      >
+        Fetch Transactions
+      </button>}
+      {isQuickBooksConnected && <button
+        onClick={handleFetchQuickbooksTransactions}
         className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
       >
         Fetch Transactions
@@ -226,13 +310,13 @@ const exportToJson = () => {
                   {transaction?.date}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {transaction?.name}
+                  {transaction?.name !== '' ? transaction?.name : '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  ${transaction?.amount.toFixed(2)}
+                  ${typeof(transaction?.amount) === 'number' ? transaction?.amount.toFixed(2) : transaction?.amount}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {transaction?.category?.join(', ')}
+                  {typeof(transaction?.category) === 'string' ? transaction?.category : transaction?.category?.join(', ')}
                 </td>
               </tr>
             ))}
