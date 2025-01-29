@@ -58,7 +58,7 @@ const LinkAccount = () => {
       console.log('Transactions:', response.data);
       setTransactionsRes(response)
       setAccounts(response.data?.accounts)
-      setTransactions(response.data?.transactions);
+      setTransactions((prevTransactions) => [...prevTransactions, ...response.data?.transactions]);
     } catch (error) {
       console.error('Error fetching transactions:', error.response?.data || error.message);
     }
@@ -164,7 +164,7 @@ const handleFetchQuickbooksTransactions = async () => {
           realmId: localStorage.getItem("quickBooksRealmId")
         }
       });
-    setTransactions(response.data)
+    setTransactions((prevTransactions) => [...prevTransactions, ...response.data?.transactions]);
   }catch(error){
     console.error("Error fetching quickbooks transactions:", error)
   }
