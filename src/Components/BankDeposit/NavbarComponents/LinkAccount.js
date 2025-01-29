@@ -164,7 +164,7 @@ const handleFetchQuickbooksTransactions = async () => {
           realmId: localStorage.getItem("quickBooksRealmId")
         }
       });
-    setTransactions((prevTransactions) => [...prevTransactions, ...response.data?.transactions]);
+    setTransactions((prevTransactions) => [...prevTransactions, ...response.data]);
   }catch(error){
     console.error("Error fetching quickbooks transactions:", error)
   }
