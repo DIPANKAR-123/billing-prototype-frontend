@@ -1,58 +1,150 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Upload, FileText, CreditCard, Users, ClipboardList, UploadIcon } from 'lucide-react'
+import { useState } from "react";
+import {
+  Upload,
+  FileText,
+  CreditCard,
+  Users,
+  ClipboardList,
+  UploadIcon,
+} from "lucide-react";
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState('EOB')
+  const [activeTab, setActiveTab] = useState("EOB");
   const [documents] = useState([
-    { date: '2023-05-15', status: 'converted', pdfLink: '#' },
-    { date: '2023-05-14', status: 'partially converted', pdfLink: '#' },
-    { date: '2023-05-13', status: 'error', pdfLink: '#' },
-  ])
+    { date: "2023-05-15", status: "converted", pdfLink: "#" },
+    { date: "2023-05-14", status: "partially converted", pdfLink: "#" },
+    { date: "2023-05-13", status: "error", pdfLink: "#" },
+  ]);
 
   const [paymentRecords] = useState([
-    { payorName: 'Blue Cross', clientName: 'John Doe', amount: '$500.00', claimDate: '2023-05-10', appointmentDate: '2023-05-05' },
-    { payorName: 'Aetna', clientName: 'Jane Smith', amount: '$750.00', claimDate: '2023-05-11', appointmentDate: '2023-05-06' },
-    { payorName: 'UnitedHealth', clientName: 'Bob Johnson', amount: '$1000.00', claimDate: '2023-05-12', appointmentDate: '2023-05-07' },
-    { payorName: 'Cigna', clientName: 'Alice Brown', amount: '$250.00', claimDate: '2023-05-13', appointmentDate: '2023-05-08' },
-    { payorName: 'Medicare', clientName: 'Charlie Davis', amount: '$1500.00', claimDate: '2023-05-14', appointmentDate: '2023-05-09' },
-  ])
+    {
+      payorName: "Blue Cross",
+      clientName: "John Doe",
+      amount: "$500.00",
+      claimDate: "2023-05-10",
+      appointmentDate: "2023-05-05",
+    },
+    {
+      payorName: "Aetna",
+      clientName: "Jane Smith",
+      amount: "$750.00",
+      claimDate: "2023-05-11",
+      appointmentDate: "2023-05-06",
+    },
+    {
+      payorName: "UnitedHealth",
+      clientName: "Bob Johnson",
+      amount: "$1000.00",
+      claimDate: "2023-05-12",
+      appointmentDate: "2023-05-07",
+    },
+    {
+      payorName: "Cigna",
+      clientName: "Alice Brown",
+      amount: "$250.00",
+      claimDate: "2023-05-13",
+      appointmentDate: "2023-05-08",
+    },
+    {
+      payorName: "Medicare",
+      clientName: "Charlie Davis",
+      amount: "$1500.00",
+      claimDate: "2023-05-14",
+      appointmentDate: "2023-05-09",
+    },
+  ]);
 
   const [appointments] = useState([
-    { date: '2023-05-20', clientName: 'John Doe', insuranceType: 'Medicare', status: 'Scheduled' },
-    { date: '2023-05-21', clientName: 'Jane Smith', insuranceType: 'Blue Cross', status: 'Confirmed' },
-    { date: '2023-05-22', clientName: 'Bob Johnson', insuranceType: 'Aetna', status: 'Completed' },
-    { date: '2023-05-23', clientName: 'Alice Brown', insuranceType: 'Cigna', status: 'Cancelled' },
-    { date: '2023-05-24', clientName: 'Charlie Davis', insuranceType: 'UnitedHealth', status: 'Rescheduled' },
-  ])
+    {
+      date: "2023-05-20",
+      clientName: "John Doe",
+      insuranceType: "Medicare",
+      status: "Scheduled",
+    },
+    {
+      date: "2023-05-21",
+      clientName: "Jane Smith",
+      insuranceType: "Blue Cross",
+      status: "Confirmed",
+    },
+    {
+      date: "2023-05-22",
+      clientName: "Bob Johnson",
+      insuranceType: "Aetna",
+      status: "Completed",
+    },
+    {
+      date: "2023-05-23",
+      clientName: "Alice Brown",
+      insuranceType: "Cigna",
+      status: "Cancelled",
+    },
+    {
+      date: "2023-05-24",
+      clientName: "Charlie Davis",
+      insuranceType: "UnitedHealth",
+      status: "Rescheduled",
+    },
+  ]);
 
   const [claims] = useState([
-    { date: '2023-05-15', clientName: 'John Doe', status: 'Submitted', amount: '$500.00', payor: 'Medicare' },
-    { date: '2023-05-16', clientName: 'Jane Smith', status: 'In Process', amount: '$750.00', payor: 'Blue Cross' },
-    { date: '2023-05-17', clientName: 'Bob Johnson', status: 'Denied', amount: '$1000.00', payor: 'Aetna' },
-    { date: '2023-05-18', clientName: 'Alice Brown', status: 'Paid', amount: '$250.00', payor: 'Cigna' },
-    { date: '2023-05-19', clientName: 'Charlie Davis', status: 'Appeal', amount: '$1500.00', payor: 'UnitedHealth' },
-  ])
+    {
+      date: "2023-05-15",
+      clientName: "John Doe",
+      status: "Submitted",
+      amount: "$500.00",
+      payor: "Medicare",
+    },
+    {
+      date: "2023-05-16",
+      clientName: "Jane Smith",
+      status: "In Process",
+      amount: "$750.00",
+      payor: "Blue Cross",
+    },
+    {
+      date: "2023-05-17",
+      clientName: "Bob Johnson",
+      status: "Denied",
+      amount: "$1000.00",
+      payor: "Aetna",
+    },
+    {
+      date: "2023-05-18",
+      clientName: "Alice Brown",
+      status: "Paid",
+      amount: "$250.00",
+      payor: "Cigna",
+    },
+    {
+      date: "2023-05-19",
+      clientName: "Charlie Davis",
+      status: "Appeal",
+      amount: "$1500.00",
+      payor: "UnitedHealth",
+    },
+  ]);
 
   const getStatusColor = (status) => {
-    const statusColors= {
-      'converted': 'bg-green-100 text-green-800',
-      'partially converted': 'bg-yellow-100 text-yellow-800',
-      'error': 'bg-red-100 text-red-800',
-      'Scheduled': 'bg-blue-100 text-blue-800',
-      'Confirmed': 'bg-green-100 text-green-800',
-      'Completed': 'bg-purple-100 text-purple-800',
-      'Cancelled': 'bg-red-100 text-red-800',
-      'Rescheduled': 'bg-yellow-100 text-yellow-800',
-      'Submitted': 'bg-blue-100 text-blue-800',
-      'In Process': 'bg-yellow-100 text-yellow-800',
-      'Denied': 'bg-red-100 text-red-800',
-      'Paid': 'bg-green-100 text-green-800',
-      'Appeal': 'bg-purple-100 text-purple-800',
-    }
-    return statusColors[status] || 'bg-gray-100 text-gray-800'
-  }
+    const statusColors = {
+      converted: "bg-green-100 text-green-800",
+      "partially converted": "bg-yellow-100 text-yellow-800",
+      error: "bg-red-100 text-red-800",
+      Scheduled: "bg-blue-100 text-blue-800",
+      Confirmed: "bg-green-100 text-green-800",
+      Completed: "bg-purple-100 text-purple-800",
+      Cancelled: "bg-red-100 text-red-800",
+      Rescheduled: "bg-yellow-100 text-yellow-800",
+      Submitted: "bg-blue-100 text-blue-800",
+      "In Process": "bg-yellow-100 text-yellow-800",
+      Denied: "bg-red-100 text-red-800",
+      Paid: "bg-green-100 text-green-800",
+      Appeal: "bg-purple-100 text-purple-800",
+    };
+    return statusColors[status] || "bg-gray-100 text-gray-800";
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -83,29 +175,33 @@ export default function Dashboard() {
       <div className="flex-1 p-8">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold mb-2">Medpay Dashboard</h1>
-          <p className="text-gray-600 mb-6">Manage your EOB, Appointments, Claims, and Workbook</p>
+          <p className="text-gray-600 mb-6">
+            Manage your EOB, Appointments, Claims, Payments, and Workbook
+          </p>
 
           {/* Tabs */}
           <div className="border-b border-gray-200 mb-6">
             <nav className="flex space-x-8">
-              {['EOB', 'Appointments', 'Claims', 'Workbook'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`py-4 px-1 relative ${
-                    activeTab === tab
-                      ? 'text-gray-900 border-b-2 border-gray-900'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+              {["EOB", "Appointments", "Payments", "Claims", "Workbook"].map(
+                (tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`py-4 px-1 relative ${
+                      activeTab === tab
+                        ? "text-gray-900 border-b-2 border-gray-900"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                )
+              )}
             </nav>
           </div>
 
           {/* Tab Content */}
-          {activeTab === 'EOB' && (
+          {activeTab === "EOB" && (
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-lg border border-gray-200">
                 <h2 className="text-lg font-semibold mb-4">Upload EOBs</h2>
@@ -113,8 +209,12 @@ export default function Dashboard() {
                   <div className="flex justify-center mb-4">
                     <UploadIcon className="w-12 h-12 text-gray-400" />
                   </div>
-                  <p className="text-gray-600 mb-2">Click to upload or drag and drop</p>
-                  <p className="text-sm text-gray-500">PDF, PNG, JPG or GIF (MAX. 10MB)</p>
+                  <p className="text-gray-600 mb-2">
+                    Click to upload or drag and drop
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    PDF, PNG, JPG or GIF (MAX. 10MB)
+                  </p>
                 </div>
                 <button className="w-full mt-4 bg-black text-white py-2 rounded-lg hover:bg-gray-800">
                   Upload EOBs
@@ -136,12 +236,21 @@ export default function Dashboard() {
                       <tr key={index} className="border-b border-gray-100">
                         <td className="py-3">{doc.date}</td>
                         <td className="py-3">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(doc.status)}`}>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                              doc.status
+                            )}`}
+                          >
                             {doc.status}
                           </span>
                         </td>
                         <td className="py-3">
-                          <a href={doc.pdfLink} className="text-blue-600 hover:underline">View PDF</a>
+                          <a
+                            href={doc.pdfLink}
+                            className="text-blue-600 hover:underline"
+                          >
+                            View PDF
+                          </a>
                         </td>
                       </tr>
                     ))}
@@ -150,7 +259,9 @@ export default function Dashboard() {
               </div>
 
               <div className="bg-white p-6 rounded-lg border border-gray-200">
-                <h2 className="text-lg font-semibold mb-4">Detected Payment Records</h2>
+                <h2 className="text-lg font-semibold mb-4">
+                  Detected Payment Records
+                </h2>
                 <table className="w-full">
                   <thead>
                     <tr className="text-left border-b border-gray-200">
@@ -180,7 +291,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {activeTab === 'Appointments' && (
+          {activeTab === "Appointments" && (
             <div className="bg-white p-6 rounded-lg border border-gray-200">
               <h2 className="text-lg font-semibold mb-4">Appointments</h2>
               <table className="w-full">
@@ -199,7 +310,11 @@ export default function Dashboard() {
                       <td className="py-3">{appointment.clientName}</td>
                       <td className="py-3">{appointment.insuranceType}</td>
                       <td className="py-3">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                            appointment.status
+                          )}`}
+                        >
                           {appointment.status}
                         </span>
                       </td>
@@ -209,8 +324,9 @@ export default function Dashboard() {
               </table>
             </div>
           )}
+          
 
-          {activeTab === 'Claims' && (
+          {activeTab === "Claims" && (
             <div className="bg-white p-6 rounded-lg border border-gray-200">
               <h2 className="text-lg font-semibold mb-4">Claims</h2>
               <table className="w-full">
@@ -229,7 +345,11 @@ export default function Dashboard() {
                       <td className="py-3">{claim.date}</td>
                       <td className="py-3">{claim.clientName}</td>
                       <td className="py-3">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(claim.status)}`}>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                            claim.status
+                          )}`}
+                        >
                           {claim.status}
                         </span>
                       </td>
@@ -242,7 +362,14 @@ export default function Dashboard() {
             </div>
           )}
 
-          {activeTab === 'Workbook' && (
+          {activeTab === "Payments" && (
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h2 className="text-lg font-semibold mb-4">Payments</h2>
+              <p className="text-gray-600">Workbook content goes here</p>
+            </div>
+          )}
+
+          {activeTab === "Workbook" && (
             <div className="bg-white p-6 rounded-lg border border-gray-200">
               <h2 className="text-lg font-semibold mb-4">Workbook</h2>
               <p className="text-gray-600">Workbook content goes here</p>
@@ -251,5 +378,5 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

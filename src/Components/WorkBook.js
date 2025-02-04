@@ -1,11 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const WorkBook = ({ matchedRecords }) => {
   const [filter, setFilter] = useState("All");
+  const [paymentRecords, setPaymentRecords] = useState([]);
+
+  // Fetch payment summary records when the component mounts
+  useEffect(() => {
+    fetch("http://localhost:4000/ai/generate/payment-summary")
+      .then((response) => response.json())
+      .then((data) => setPaymentRecords(data))
+      .catch((error) =>
+        console.error("Error fetching payment summary: ", error)
+      );
+  }, []);
+
   const filteredRecords =
     filter === "All"
       ? matchedRecords
-      : matchedRecords?.filter((record) => record.matchStatus === filter);
+      : matchedRecords?.filter(
+          (record) => record.matchStatus === filter
+        );
+
   const totalEOB = matchedRecords?.reduce(
     (sum, record) => sum + (Number(record.eobAmount) || 0),
     0
@@ -14,8 +29,10 @@ const WorkBook = ({ matchedRecords }) => {
     ?.filter((record) => record.matchStatus !== "Record Exist")
     .reduce((sum, record) => sum + (Number(record.eobAmount) || 0), 0);
   const matchedCount =
-    matchedRecords?.filter((record) => record.matchStatus === "Record Exist")
-      .length || 0;
+    matchedRecords?.filter(
+      (record) => record.matchStatus === "Record Exist"
+    ).length || 0;
+
   return (
     <div>
       <div className='bg-white p-6 rounded-lg border border-gray-200 mb-6'>
@@ -70,21 +87,41 @@ const WorkBook = ({ matchedRecords }) => {
               <th className='pb-3 mr-4 pr-8'>Appt Amount</th>
               <th className='pb-3'>Match Status</th>
               <th className='pb-3'>Amount Matched Status</th>
+              <th className='pb-3'>Payment Status</th>
+              <th className='pb-3'>EOB Received</th>
             </tr>
           </thead>
           <tbody>
-            {filteredRecords?.map((record, index) => (
-              <tr key={index} className='border-b border-gray-100'>
-                <td className='py-3'>{record?.appointmentDate}</td>
-                <td className='py-3'>{record?.payor}</td>
-                <td className='py-3'>{record?.client}</td>
-                <td className='py-3'>{record?.eobAmount}</td>
-                <td className='py-3'>{record?.appointmentAmount}</td>
-                <td className='py-3'>{record?.matchStatus}</td>
-                <td className='py-3'>{record?.amountMatched}</td>
-                {/* Add more fields as needed */}
-              </tr>
-            ))}
+            {filteredRecords?.map((record, index) => {
+              // Find a matching payment record using both the appointment date and payor name
+              const matchingPaymentRecord = paymentRecords.find(
+                (payment) =>
+                  payment.appointmentDate === record.appointmentDate &&
+                  payment.payor === record.payor
+              );
+
+              return (
+                <tr key={index} className='border-b border-gray-100'>
+                  <td className='py-3'>{record?.appointmentDate}</td>
+                  <td className='py-3'>{record?.payor}</td>
+                  <td className='py-3'>{record?.client}</td>
+                  <td className='py-3'>{record?.eobAmount}</td>
+                  <td className='py-3'>{record?.appointmentAmount}</td>
+                  <td className='py-3'>{record?.matchStatus}</td>
+                  <td className='py-3'>{record?.amountMatched}</td>
+                  <td className='py-3'>
+                    {matchingPaymentRecord
+                      ? matchingPaymentRecord.paymentStatus
+                      : ""}
+                  </td>
+                  <td className='py-3'>
+                    {matchingPaymentRecord
+                      ? matchingPaymentRecord.eobReceived
+                      : ""}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

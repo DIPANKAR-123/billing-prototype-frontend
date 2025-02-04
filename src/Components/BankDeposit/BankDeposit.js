@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { usePlaidLink } from 'react-plaid-link';
 import UploadReconciliation from './NavbarComponents/UploadReconciliation';
 import LinkAccount from './NavbarComponents/LinkAccount';
 import Spreadsheet from './NavbarComponents/Spreadsheet';
 import FinancialSummary from './NavbarComponents/FinancialSummary';
+import Payments from '../Payments';
 
 
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('connect-account');
- 
 
-  
+  useEffect(() => {
+    console.log(activeTab);
+  }, [activeTab]);
 
- 
+
+
 
   return (
     <div className="w-full   p-6">
@@ -25,7 +28,7 @@ export default function Dashboard() {
 
         <div className="border-b border-gray-200">
           <nav className="flex">
-            {['Connect Account','Upload' , 'Spreadsheet View', 'Financial Summary'].map((tab) => (
+            {['Connect Account','Bank Records' , 'Payment Records', 'Financial Summary' , 'Workbook'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab.toLowerCase().replace(' ', '-'))}
@@ -40,9 +43,10 @@ export default function Dashboard() {
             ))}
           </nav>
         </div>
+        
 
         <div className="p-6">
-          {activeTab === 'upload' && (
+          {activeTab === 'bank-records' && (
            <UploadReconciliation/>
           )}
 
@@ -50,12 +54,16 @@ export default function Dashboard() {
             <LinkAccount/>
           )}
 
-          {activeTab === 'spreadsheet-view' && (
-            <Spreadsheet/>
+          {activeTab === 'payment-records' && (
+            <Payments/>
           )}
 
           {activeTab === 'financial-summary' && (
             <FinancialSummary/>
+          )}
+
+          {activeTab === 'workbook' && (
+            <></>
           )}
         </div>
       </div>
