@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { useState, useEffect } from "react";
 import {
   Upload,
@@ -14,8 +14,10 @@ import DetectedPaymentRecord from "./DetectedPaymentRecord";
 import Appointments from "./Appointments";
 import WorkBook from "./WorkBook";
 import getBaseUrl from "../utils/getBaseUrl";
+import Payments from "./Payments";
+
 const GoPayDashboard = () => {
-    const [activeTab, setActiveTab] = useState("EOB");
+  const [activeTab, setActiveTab] = useState("EOB");
   const [loading, setLoading] = useState("false");
 
   const [claims] = useState([
@@ -78,7 +80,7 @@ const GoPayDashboard = () => {
   const [paymentRecords, setPaymentRecords] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5); // 
+  const [itemsPerPage, setItemsPerPage] = useState(5); //
   const [matchedRecords, setMatchedRecords] = useState([]);
   const BASE_URL = getBaseUrl();
 
@@ -92,16 +94,16 @@ const GoPayDashboard = () => {
         const responsePayments = await fetch(
           `${BASE_URL}/ai/generate/payment-records`
         );
-         try {
-              const response = await fetch(`${BASE_URL}/ai/generate/jobs`);
-              if (!response.ok) {
-                throw new Error('Failed to fetch jobs');
-              }
-              const data = await response.json();
-              setDocuments(data);
-            } catch (error) {
-            } finally {
-            }
+        try {
+          const response = await fetch(`${BASE_URL}/ai/generate/jobs`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch jobs");
+          }
+          const data = await response.json();
+          setDocuments(data);
+        } catch (error) {
+        } finally {
+        }
         if (!responseAppointments.ok || !responsePayments.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -138,36 +140,38 @@ const GoPayDashboard = () => {
     fetchAndMatchData();
   }, []);
   return (
-    <div className='flex-1 p-8'>
-    <div className='w-full mx-auto'>
-      <h1 className='text-2xl font-bold mb-2'>Medpay Dashboard</h1>
-      <p className='text-gray-600 mb-6'>
-        Manage your EOB, Appointments, Claims, and Workbook
-      </p>
+    <div className="flex-1 p-8">
+      <div className="w-full mx-auto">
+        <h1 className="text-2xl font-bold mb-2">Medpay Dashboard</h1>
+        <p className="text-gray-600 mb-6">
+          Manage your EOB, Appointments, Claims, Payments, and Workbook
+        </p>
 
-      {/* Tabs */}
-      <div className='border-b border-gray-200 mb-6'>
-        <nav className='flex space-x-8'>
-          {["EOB", "Appointments", "Claims", "Workbook"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`py-4 px-1 relative ${
-                activeTab === tab
-                  ? "text-gray-900 border-b-2 border-gray-900"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </nav>
-      </div>
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="flex space-x-8">
+            {["EOB", "Appointments", "Claims", "Payments", "Workbook"].map(
+              (tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`py-4 px-1 relative ${
+                    activeTab === tab
+                      ? "text-gray-900 border-b-2 border-gray-900"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  {tab}
+                </button>
+              )
+            )}
+          </nav>
+        </div>
 
-      {/* Tab Content */}
-      {activeTab === "EOB" && (
-        <div className='space-y-6'>
-          {/* <div className="bg-white p-6 rounded-lg border border-gray-200">
+        {/* Tab Content */}
+        {activeTab === "EOB" && (
+          <div className="space-y-6">
+            {/* <div className="bg-white p-6 rounded-lg border border-gray-200">
             <h2 className="text-lg font-semibold mb-4">Upload EOBs</h2>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
               <div className="flex justify-center mb-4">
@@ -181,73 +185,87 @@ const GoPayDashboard = () => {
               Upload EOBs
             </button>
           </div> */}
-          <FileUpload text={"EOBs"} setActiveTab={setActiveTab}/>
-          <EOBDocuments documents={documents} currentPage={currentPage} setCurrentPage={setCurrentPage} itemsPerPage={itemsPerPage} />
+            <FileUpload text={"EOBs"} setActiveTab={setActiveTab} />
+            <EOBDocuments
+              documents={documents}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+            />
+            {loading ? (
+              <>Loading...</>
+            ) : paymentRecords.length > 0 ? (
+              <DetectedPaymentRecord paymentRecords={paymentRecords} />
+            ) : (
+              <p className="text-gray-600">No EOB Payment records available.</p>
+            )}
+
+            {/* <DetectedPaymentRecord paymentRecords={paymentRecords}/> */}
+          </div>
+        )}
+
+        {activeTab === "Appointments" && (
+          <>
+            {loading ? (
+              <>Loading...</>
+            ) : (
+              <Appointments appointments={appointments} />
+            )}
+          </>
+        )}
+
+        {activeTab === "Claims" && (
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h2 className="text-lg font-semibold mb-4">Claims</h2>
+            <table className="w-full">
+              <thead>
+                <tr className="text-left border-b border-gray-200">
+                  <th className="pb-3">Appointment Date</th>
+                  <th className="pb-3">Client Name</th>
+                  <th className="pb-3">Claim Status</th>
+                  <th className="pb-3">Claim Amount</th>
+                  <th className="pb-3">Payor</th>
+                </tr>
+              </thead>
+              <tbody>
+                {claims.map((claim, index) => (
+                  <tr key={index} className="border-b border-gray-100">
+                    <td className="py-3">{claim.date}</td>
+                    <td className="py-3">{claim.clientName}</td>
+                    <td className="py-3">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                          claim.status
+                        )}`}
+                      >
+                        {claim.status}
+                      </span>
+                    </td>
+                    <td className="py-3">{claim.amount}</td>
+                    <td className="py-3">{claim.payor}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === "Payments" && (
+          <>
           {loading ? (
             <>Loading...</>
-          ) : paymentRecords.length > 0 ? (
-            <DetectedPaymentRecord paymentRecords={paymentRecords} />
           ) : (
-            <p className='text-gray-600'>
-              No EOB Payment records available.
-            </p>
-          )}
+              <Payments appointments={appointments} />
+            )}
+          </>
+        )}
 
-          {/* <DetectedPaymentRecord paymentRecords={paymentRecords}/> */}
-        </div>
-      )}
-
-      {activeTab === "Appointments" && (<>
-        {loading ? (
-          <>Loading...</>
-        ) : (
-          <Appointments appointments={appointments} />
-        ) }
-        </>
-      )}
-
-      {activeTab === "Claims" && (
-        <div className='bg-white p-6 rounded-lg border border-gray-200'>
-          <h2 className='text-lg font-semibold mb-4'>Claims</h2>
-          <table className='w-full'>
-            <thead>
-              <tr className='text-left border-b border-gray-200'>
-                <th className='pb-3'>Appointment Date</th>
-                <th className='pb-3'>Client Name</th>
-                <th className='pb-3'>Claim Status</th>
-                <th className='pb-3'>Claim Amount</th>
-                <th className='pb-3'>Payor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {claims.map((claim, index) => (
-                <tr key={index} className='border-b border-gray-100'>
-                  <td className='py-3'>{claim.date}</td>
-                  <td className='py-3'>{claim.clientName}</td>
-                  <td className='py-3'>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                        claim.status
-                      )}`}
-                    >
-                      {claim.status}
-                    </span>
-                  </td>
-                  <td className='py-3'>{claim.amount}</td>
-                  <td className='py-3'>{claim.payor}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {activeTab === "Workbook" && (
-        <WorkBook matchedRecords={matchedRecords} />
-      )}
+        {activeTab === "Workbook" && (
+          <WorkBook matchedRecords={matchedRecords} />
+        )}
+      </div>
     </div>
-  </div>
-  )
-}
+  );
+};
 
-export default GoPayDashboard
+export default GoPayDashboard;
